@@ -1,33 +1,36 @@
 <template>
   <v-layout>
-    <v-form 
-      ref="form"
-      v-model="valid" 
-      lazy-validation>
-      <v-text-field
-        v-model="name"
-        :rules="nameRules"
-        label="Name"
-        required
-      />
-      <v-text-field
-        v-model="password"
-        :rules="passwordRules"
-        label="Password"
-        required
-      />
-      <v-btn
-        :disjkled="!valid"
-        @click="submit"
-      >
-        submit
-      </v-btn>
-    </v-form>
+    <v-flex text-xs-center>
+      <v-form 
+        ref="form"
+        v-model="valid" 
+        lazy-validation>
+        <v-text-field
+          v-model="name"
+          :rules="nameRules"
+          label="Name"
+          required
+        />
+        <v-text-field
+          v-model="password"
+          :rules="passwordRules"
+          label="Password"
+          required
+        />
+        <v-btn
+          :disjkled="!valid"
+          @click="submit"
+        >
+          submit
+        </v-btn>
+      </v-form>
+    </v-flex>
   </v-layout>
 </template>
 
 <script>
-import axios from 'axios'
+import axios from '@/commons/axios'
+import { API_HOST } from '@/commons/constants'
 
 export default {
   data: () => ({
@@ -41,7 +44,7 @@ export default {
     submit() {
       if (this.$refs.form.validate()) {
         axios
-          .post('//localhost:8080/login', {
+          .post(`${API_HOST}/login`, {
             username: this.name,
             password: this.password
           })
@@ -53,3 +56,9 @@ export default {
   }
 }
 </script>
+
+<style>
+form {
+  width: 20rem;
+}
+</style>
