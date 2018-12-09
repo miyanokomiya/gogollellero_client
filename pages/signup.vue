@@ -1,28 +1,38 @@
 <template>
   <v-layout>
-    <v-form 
-      ref="form"
-      v-model="valid" 
-      lazy-validation>
-      <v-text-field
-        v-model="name"
-        :rules="nameRules"
-        label="Name"
-        required
-      />
-      <v-text-field
-        v-model="password"
-        :rules="passwordRules"
-        label="Password"
-        required
-      />
-      <v-btn
-        :disjkled="!valid"
-        @click="submit"
+    <v-flex>
+      <v-form 
+        ref="form"
+        v-model="valid" 
+        lazy-validation
+        @submit.prevent="submit"
       >
-        submit
-      </v-btn>
-    </v-form>
+        <v-text-field
+          v-model="name"
+          :rules="nameRules"
+          :counter="64"
+          label="Name"
+          required
+          autofocus
+        />
+        <v-text-field
+          v-model="password"
+          :rules="passwordRules"
+          :counter="64"
+          label="Password"
+          type="password"
+          required
+        />
+        <div class="buttons">
+          <v-btn
+            :disabled="!valid"
+            type="submit"
+          >
+            submit
+          </v-btn>
+        </div>
+      </v-form>
+    </v-flex>
   </v-layout>
 </template>
 
@@ -35,12 +45,12 @@ export default {
     name: '',
     nameRules: [
       v => !!v || 'required',
-      v => (v && v.length <= 10) || '4 <= name <= 64'
+      v => (4 <= v.length && v.length <= 64) || '4 <= name <= 64'
     ],
     password: '',
     passwordRules: [
       v => !!v || 'required',
-      v => (v && v.length <= 10) || '4 <= name <= 64'
+      v => (8 <= v.length && v.length <= 64) || '8 <= name <= 64'
     ]
   }),
   methods: {
@@ -52,10 +62,20 @@ export default {
             password: this.password
           })
           .then(res => {
-            console.log(res)
+            this.$router.push('/signin')
           })
       }
     }
   }
 }
 </script>
+
+<style scoped>
+form {
+  width: 20rem;
+  margin: 2rem auto;
+}
+.buttons {
+  text-align: right;
+}
+</style>

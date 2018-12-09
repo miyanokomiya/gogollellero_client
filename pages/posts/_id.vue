@@ -4,12 +4,16 @@
       <v-form 
         ref="form"
         v-model="valid" 
-        lazy-validation>
+        lazy-validation
+        @submit.prevent
+      >
         <h2>Title</h2>
         <v-text-field
           v-model="localPost.title"
           :rules="titleRules"
+          :counter="64"
           required
+          autofocus
         />
         <h2>Problem</h2>
         <v-textarea
@@ -33,7 +37,7 @@
           auto-grow
         />
         <v-btn
-          :disjkled="!valid"
+          :disabled="!valid"
           @click="submit"
         >
           submit
@@ -52,7 +56,7 @@ export default {
     post: null,
     localPost: null,
     valid: true,
-    titleRules: [v => !!v || 'required']
+    titleRules: [v => !!v || 'required', v => v.length <= 64 || 'title <= 64']
   }),
   mounted() {
     axios

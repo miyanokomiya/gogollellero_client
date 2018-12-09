@@ -30,7 +30,6 @@
 
 <script>
 import axios from '@/commons/axios'
-import { API_HOST } from '@/commons/constants'
 
 export default {
   data: () => ({
@@ -38,7 +37,7 @@ export default {
   }),
   mounted() {
     axios
-      .get(`${API_HOST}/private/users`)
+      .get(`/private/users`)
       .then(({ data }) => {
         this.users = data
       })

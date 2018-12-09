@@ -39,7 +39,6 @@
 
 <script>
 import axios from '@/commons/axios'
-import { API_HOST } from '@/commons/constants'
 
 export default {
   data: () => ({
@@ -51,7 +50,7 @@ export default {
   methods: {
     load() {
       axios
-        .get(`${API_HOST}/private/posts`)
+        .get(`/private/posts`)
         .then(({ data }) => {
           this.posts = data
         })
@@ -59,7 +58,7 @@ export default {
     },
     create() {
       axios
-        .post(`${API_HOST}/private/posts`, {
+        .post(`/private/posts`, {
           title: 'untitled'
         })
         .then(({ data }) => {
@@ -69,7 +68,7 @@ export default {
     },
     deletePost(id) {
       axios
-        .delete(`${API_HOST}/private/posts/${id}`)
+        .delete(`/private/posts/${id}`)
         .then(({ data }) => {
           this.load()
         })
