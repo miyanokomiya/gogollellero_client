@@ -23,6 +23,14 @@
               <v-list-tile-sub-title>{{ post.createdAt }}</v-list-tile-sub-title>
             </router-link>
           </v-list-tile-content>
+          <v-list-tile-action>
+            <v-btn 
+              icon 
+              ripple
+              @click="deletePost(post.id)">
+              <v-icon color="grey lighten-1">delete</v-icon>
+            </v-btn>
+          </v-list-tile-action>
         </v-list-tile> 
       </v-list>
     </v-flex>
@@ -38,14 +46,17 @@ export default {
     posts: []
   }),
   mounted() {
-    axios
-      .get(`${API_HOST}/private/posts`)
-      .then(({ data }) => {
-        this.posts = data
-      })
-      .catch(console.log)
+    this.load()
   },
   methods: {
+    load() {
+      axios
+        .get(`${API_HOST}/private/posts`)
+        .then(({ data }) => {
+          this.posts = data
+        })
+        .catch(console.log)
+    },
     create() {
       axios
         .post(`${API_HOST}/private/posts`, {
@@ -53,6 +64,14 @@ export default {
         })
         .then(({ data }) => {
           this.$router.push(`/posts/${data.id}`)
+        })
+        .catch(console.log)
+    },
+    deletePost(id) {
+      axios
+        .delete(`${API_HOST}/private/posts/${id}`)
+        .then(({ data }) => {
+          this.load()
         })
         .catch(console.log)
     }
