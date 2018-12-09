@@ -15,6 +15,7 @@
         <router-link to="/signin">signin</router-link>
         <router-link to="/signup">signup</router-link>
         <router-link to="/users">users</router-link>
+        <router-link to="/posts">posts</router-link>
       </v-card>
     </v-flex>
   </v-layout>
