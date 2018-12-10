@@ -37,7 +37,8 @@
         <v-card-actions>
           <v-btn 
             flat 
-            color="orange">Delete</v-btn>
+            color="orange"
+            @click="deletePost(post.id)">Delete</v-btn>
         </v-card-actions>
       </v-card>
     </v-flex>
