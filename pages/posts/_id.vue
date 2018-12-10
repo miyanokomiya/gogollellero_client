@@ -14,33 +14,18 @@
           :counter="64"
           required
           autofocus
+          color="green"
         />
         <h2>Tags</h2>
-        <!-- <div class="tags">
-          <v-chip 
-            v-for="(title, i) in tags" 
-            :key="i" 
-            close
-            color="green"
-            text-color="white"
-            small
-            @input="deleteTag(title)"
-          >
-            {{ title }}
-          </v-chip>
-        </div>
-        <v-text-field
-          :value="tagInput"
-          :rules="tagRules"
-          :counter="64"
-          @input="changeTagInput"
-        /> -->
         <v-combobox
           v-model="tags"
           :items="tagOptions"
           :search-input.sync="searchTagText"
           :rules="tagRules"
+          :counter="10"
           chips
+          small-chips
+          color="green"
           deletable-chips
           multiple
         />
@@ -57,21 +42,32 @@
             v-html="markedPorblem"/>
         </div>
         <h2>Solution</h2>
-        <v-textarea
-          v-model="localPost.solution"
-          box
-          solo
-          auto-grow
-        />
+        <div class="editor-box">
+          <v-textarea
+            v-model="localPost.solution"
+            box
+            solo
+            auto-grow
+          />
+          <div 
+            class="marked markdown-body" 
+            v-html="markedSolution"/>
+        </div>
         <h2>Lesson</h2>
-        <v-textarea
-          v-model="localPost.lesson"
-          box
-          solo
-          auto-grow
-        />
+        <div class="editor-box">
+          <v-textarea
+            v-model="localPost.lesson"
+            box
+            solo
+            auto-grow
+          />
+          <div 
+            class="marked markdown-body" 
+            v-html="markedLesson"/>
+        </div>
         <v-btn
           :disabled="!valid"
+          color="success"
           @click="submit"
         >
           submit
@@ -93,7 +89,7 @@ export default {
     valid: true,
     titleRules: [v => !!v || 'required', v => v.length <= 64 || 'title <= 64'],
     tags: [],
-    tagRules: [v => v.length <= 64 || 'title <= 64'],
+    tagRules: [v => v.length <= 10 || 'tags <= 10'],
     tagOptions: [],
     searchTagText: '',
     searchTimer: 0
@@ -101,6 +97,12 @@ export default {
   computed: {
     markedPorblem() {
       return marked(this.localPost.problem)
+    },
+    markedSolution() {
+      return marked(this.localPost.solution)
+    },
+    markedLesson() {
+      return marked(this.localPost.lesson)
     }
   },
   watch: {
@@ -164,6 +166,7 @@ export default {
 
 <style scoped>
 h2 {
+  font-size: 2rem;
   text-align: left;
 }
 .tags {
@@ -171,6 +174,8 @@ h2 {
 }
 .editor-box {
   display: flex;
+  margin-bottom: 1rem;
+  border-bottom: 0.1rem solid rgba(100, 100, 100, 0.5);
 }
 .editor-box > * {
   width: 50%;
