@@ -7,32 +7,39 @@
         @click="create">
         <v-icon color="grey lighten-1">add</v-icon>
       </v-btn>
-      <v-list 
-        two-line 
-        subheader>
-        <v-subheader inset>Posts</v-subheader>
-
-        <v-list-tile
-          v-for="post in posts"
-          :key="post.name"
-          class="item"
-        >
-          <v-list-tile-content>
-            <router-link :to="`/posts/${post.id}`">
-              <v-list-tile-title>{{ post.title }}</v-list-tile-title>
-              <v-list-tile-sub-title>{{ post.createdAt }}</v-list-tile-sub-title>
-            </router-link>
-          </v-list-tile-content>
-          <v-list-tile-action>
-            <v-btn 
-              icon 
-              ripple
-              @click="deletePost(post.id)">
-              <v-icon color="grey lighten-1">delete</v-icon>
-            </v-btn>
-          </v-list-tile-action>
-        </v-list-tile> 
-      </v-list>
+      <v-card
+        v-for="post in posts"
+        :key="post.name"
+        class="item"
+      >
+        <v-card-title 
+          primary-title 
+          class="title-box">
+          <router-link :to="`/posts/${post.id}`">
+            <h3 class="headline mb-0 title">{{ post.title }}</h3>
+            <div>{{ post.createdAt }}</div>
+            <div 
+              v-if="post.tags" 
+              class="tags"
+            >
+              <v-chip 
+                v-for="tag in post.tags" 
+                :key="tag.id" 
+                color="green"
+                text-color="white"
+                small
+              >
+                {{ tag.title }}
+              </v-chip>
+            </div>
+          </router-link>
+        </v-card-title>
+        <v-card-actions>
+          <v-btn 
+            flat 
+            color="orange">Delete</v-btn>
+        </v-card-actions>
+      </v-card>
     </v-flex>
   </v-layout>
 </template>
@@ -79,7 +86,14 @@ export default {
 </script>
 
 <style scoped>
-.item:hover {
+.item {
+  text-align: left;
+}
+.title-box a {
+  text-decoration: none;
+}
+.title-box:hover {
+  cursor: pointer;
   background-color: rgba(200, 200, 200, 0.3);
 }
 </style>

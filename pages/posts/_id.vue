@@ -23,6 +23,7 @@
             close
             color="green"
             text-color="white"
+            small
             @input="deleteTag(title)"
           >
             {{ title }}
