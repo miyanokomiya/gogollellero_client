@@ -16,7 +16,7 @@
           autofocus
         />
         <h2>Tags</h2>
-        <div class="tags">
+        <!-- <div class="tags">
           <v-chip 
             v-for="(title, i) in tags" 
             :key="i" 
@@ -34,14 +34,28 @@
           :rules="tagRules"
           :counter="64"
           @input="changeTagInput"
+        /> -->
+        <v-combobox
+          v-model="tags"
+          :items="tagOptions"
+          :search-input.sync="searchTagText"
+          :rules="tagRules"
+          chips
+          deletable-chips
+          multiple
         />
         <h2>Problem</h2>
-        <v-textarea
-          v-model="localPost.problem"
-          box
-          solo
-          auto-grow
-        />
+        <div class="editor-box">
+          <v-textarea
+            v-model="localPost.problem"
+            box
+            solo
+            auto-grow
+          />
+          <div 
+            class="marked markdown-body" 
+            v-html="markedPorblem"/>
+        </div>
         <h2>Solution</h2>
         <v-textarea
           v-model="localPost.solution"
@@ -69,7 +83,8 @@
 
 <script>
 import axios from '@/commons/axios'
-import { API_HOST } from '@/commons/constants'
+import marked from 'marked'
+import 'github-markdown-css/github-markdown.css'
 
 export default {
   data: () => ({
@@ -78,12 +93,30 @@ export default {
     valid: true,
     titleRules: [v => !!v || 'required', v => v.length <= 64 || 'title <= 64'],
     tags: [],
-    tagInput: '',
-    tagRules: [v => v.length <= 64 || 'title <= 64']
+    tagRules: [v => v.length <= 64 || 'title <= 64'],
+    tagOptions: [],
+    searchTagText: '',
+    searchTimer: 0
   }),
+  computed: {
+    markedPorblem() {
+      return marked(this.localPost.problem)
+    }
+  },
+  watch: {
+    searchTagText(to, from) {
+      if (to === from) return
+      if (this.searchTimer) clearTimeout(this.searchTimer)
+      if (this.changeTagInput(to)) return
+      this.searchTimer = setTimeout(() => {
+        console.log('search', to)
+        this.searchTimer = 0
+      }, 300)
+    }
+  },
   mounted() {
     axios
-      .get(`${API_HOST}/private/posts/${this.$route.params.id}`)
+      .get(`/private/posts/${this.$route.params.id}`)
       .then(({ data }) => {
         this.updateData(data)
       })
@@ -94,14 +127,16 @@ export default {
       this.tags = this.tags.filter(tag => tag !== title)
     },
     changeTagInput(val) {
+      if (!val) return
       const splited = val.split(/,| |　|\t/)
       if (splited.length > 1 && splited[0].length <= 64) {
-        if (!this.tags.includes(splited[0])) {
+        if (splited[0] && !this.tags.includes(splited[0])) {
           this.tags.push(splited[0])
         }
-        this.tagInput = ''
+        this.searchTagText = ''
+        return true
       } else {
-        this.tagInput = val
+        this.searchTagText = val
       }
     },
     updateData(data) {
@@ -111,7 +146,7 @@ export default {
     },
     submit() {
       axios
-        .patch(`${API_HOST}/private/posts/${this.post.id}`, {
+        .patch(`/private/posts/${this.post.id}`, {
           title: this.localPost.title,
           problem: this.localPost.problem,
           solution: this.localPost.solution,
@@ -133,5 +168,23 @@ h2 {
 }
 .tags {
   text-align: left;
+}
+.editor-box {
+  display: flex;
+}
+.editor-box > * {
+  width: 50%;
+}
+.marked {
+  text-align: left;
+  padding: 1.2rem;
+}
+.marked /deep/ code {
+  box-shadow: none;
+  font-family: monospace, monospace;
+  font-size: 1em;
+}
+.marked /deep/ code::before {
+  content: '';
 }
 </style>
