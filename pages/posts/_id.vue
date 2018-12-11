@@ -28,6 +28,7 @@
           color="green"
           deletable-chips
           multiple
+          hide-selected
         />
         <h2>Problem</h2>
         <div class="editor-box">
@@ -111,7 +112,7 @@ export default {
       if (this.searchTimer) clearTimeout(this.searchTimer)
       if (this.changeTagInput(to)) return
       this.searchTimer = setTimeout(() => {
-        console.log('search', to)
+        this.loadTagOptions()
         this.searchTimer = 0
       }, 300)
     }
@@ -121,10 +122,28 @@ export default {
       .get(`/private/posts/${this.$route.params.id}`)
       .then(({ data }) => {
         this.updateData(data)
+        this.loadTagOptions()
       })
       .catch(console.log)
   },
   methods: {
+    loadTagOptions() {
+      axios
+        .get(`/tags`, {
+          params: {
+            page: 1,
+            limit: 10 + this.tags.length,
+            order: 'title',
+            keyword: this.searchTagText
+          }
+        })
+        .then(({ data }) => {
+          this.tagOptions = data
+            .map(tag => tag.title)
+            .filter(tag => !this.tags.includes(tag))
+        })
+        .catch(console.log)
+    },
     deleteTag(title) {
       this.tags = this.tags.filter(tag => tag !== title)
     },
