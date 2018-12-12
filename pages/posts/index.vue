@@ -11,9 +11,10 @@
         <v-chip 
           v-for="tag in tags" 
           :key="tag.id" 
-          color="green"
+          :color="tagTitle === tag.title ? 'red' : 'green'"
           text-color="white"
           small
+          @click="selectTag(tag)"
         >
           {{ tag.title }}
         </v-chip>
@@ -60,17 +61,28 @@
 import axios from '@/commons/axios'
 
 export default {
+  asyncData({ query }) {
+    return { tagTitle: query.tag || '' }
+  },
   data: () => ({
     posts: [],
     tags: []
   }),
+  watchQuery: ['tag'],
+  watch: {
+    tagTitle() {
+      this.load()
+    }
+  },
   mounted() {
     this.load()
   },
   methods: {
     load() {
       axios
-        .get(`/private/posts`)
+        .get(`/private/posts`, {
+          params: { tag: this.tagTitle || undefined }
+        })
         .then(({ data }) => {
           this.posts = data
         })
@@ -99,6 +111,13 @@ export default {
           this.load()
         })
         .catch(console.log)
+    },
+    selectTag(tag) {
+      if (this.tagTitle === tag.title) {
+        this.$router.push(`/posts`)
+      } else {
+        this.$router.push(`/posts?tag=${tag.title}`)
+      }
     }
   }
 }
