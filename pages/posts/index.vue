@@ -7,6 +7,17 @@
         @click="create">
         <v-icon color="grey lighten-1">add</v-icon>
       </v-btn>
+      <div class="my-tags">
+        <v-chip 
+          v-for="tag in tags" 
+          :key="tag.id" 
+          color="green"
+          text-color="white"
+          small
+        >
+          {{ tag.title }}
+        </v-chip>
+      </div>
       <v-card
         v-for="post in posts"
         :key="post.name"
@@ -50,7 +61,8 @@ import axios from '@/commons/axios'
 
 export default {
   data: () => ({
-    posts: []
+    posts: [],
+    tags: []
   }),
   mounted() {
     this.load()
@@ -61,6 +73,12 @@ export default {
         .get(`/private/posts`)
         .then(({ data }) => {
           this.posts = data
+        })
+        .catch(console.log)
+      axios
+        .get(`/private/tags`)
+        .then(({ data }) => {
+          this.tags = data
         })
         .catch(console.log)
     },
@@ -87,6 +105,9 @@ export default {
 </script>
 
 <style scoped>
+.my-tags {
+  margin-bottom: 1rem;
+}
 .item {
   text-align: left;
 }
