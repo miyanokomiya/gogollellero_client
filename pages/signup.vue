@@ -57,7 +57,7 @@ export default {
     submit() {
       if (this.$refs.form.validate()) {
         axios
-          .post('//localhost:8080/users', {
+          .post('/users', {
             name: this.name,
             password: this.password
           })
