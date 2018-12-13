@@ -4,6 +4,7 @@
       <v-btn 
         icon 
         ripple
+        color="blue"
         @click="create">
         <v-icon color="grey lighten-1">add</v-icon>
       </v-btn>
@@ -129,12 +130,18 @@ export default {
 }
 .item {
   text-align: left;
+  border-bottom: 0.1rem solid rgba(200, 200, 200, 0.3);
 }
 .title-box a {
   text-decoration: none;
-}
-.title-box:hover {
+  width: 100%;
+  padding: 0.6rem;
   cursor: pointer;
+}
+.title-box a:hover {
   background-color: rgba(200, 200, 200, 0.3);
+}
+.title-box {
+  padding: 0.6rem;
 }
 </style>
