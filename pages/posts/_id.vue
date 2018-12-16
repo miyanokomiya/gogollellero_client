@@ -1,93 +1,32 @@
 <template>
-  <v-layout v-if="localPost">
+  <v-layout v-if="post">
     <v-flex text-xs-center>
-      <v-form 
-        ref="form"
-        v-model="valid" 
-        lazy-validation
-        @submit.prevent
-      >
-        <h2>Title</h2>
-        <v-text-field
-          v-model="localPost.title"
-          :rules="titleRules"
-          :counter="64"
-          required
-          autofocus
-          color="green"
-        />
-        <h2>Tags</h2>
-        <v-combobox
-          v-model="tags"
-          :items="tagOptions"
-          :search-input.sync="searchTagText"
-          :rules="tagRules"
-          :counter="10"
-          chips
-          small-chips
-          color="green"
-          deletable-chips
-          multiple
-          hide-selected
-        />
+      <div>
+        <h1>{{ post.title }}</h1>
+        <div class="tags">
+          <v-chip 
+            v-for="tag in post.tags" 
+            :key="tag.id" 
+            color="green"
+            text-color="white"
+            small
+          >
+            {{ tag.title }}
+          </v-chip>
+        </div>
         <h2>Problem</h2>
-        <div class="editor-box">
-          <v-textarea
-            v-model="localPost.problem"
-            box
-            solo
-            auto-grow
-          />
-          <div 
-            class="marked markdown-body" 
-            v-html="markedPorblem"/>
-        </div>
+        <div 
+          class="marked markdown-body" 
+          v-html="markedPorblem"/>
         <h2>Solution</h2>
-        <div class="editor-box">
-          <v-textarea
-            v-model="localPost.solution"
-            box
-            solo
-            auto-grow
-          />
-          <div 
-            class="marked markdown-body" 
-            v-html="markedSolution"/>
-        </div>
+        <div 
+          class="marked markdown-body" 
+          v-html="markedSolution"/>
         <h2>Lesson</h2>
-        <div class="editor-box">
-          <v-textarea
-            v-model="localPost.lesson"
-            box
-            solo
-            auto-grow
-          />
-          <div 
-            class="marked markdown-body" 
-            v-html="markedLesson"/>
-        </div>
-        <v-btn
-          :disabled="!valid"
-          color="info"
-          @click="save"
-        >
-          Save
-        </v-btn>
-        <v-btn
-          v-if="!published"
-          :disabled="!valid"
-          color="success"
-          @click="publish"
-        >
-          Publish
-        </v-btn>
-        <v-btn
-          v-else
-          @click="unpublish"
-        >
-          Unpublish
-        </v-btn>
-      </v-form>
+        <div 
+          class="marked markdown-body" 
+          v-html="markedLesson"/>
+      </div>
     </v-flex>
   </v-layout>
 </template>
@@ -99,147 +38,50 @@ import 'github-markdown-css/github-markdown.css'
 
 export default {
   data: () => ({
-    post: null,
-    localPost: null,
-    valid: true,
-    titleRules: [v => !!v || 'required', v => v.length <= 64 || 'title <= 64'],
-    tags: [],
-    tagRules: [v => v.length <= 10 || 'tags <= 10'],
-    tagOptions: [],
-    searchTagText: '',
-    searchTimer: 0
+    post: null
   }),
   computed: {
     markedPorblem() {
-      return marked(this.localPost.problem)
+      return marked(this.post.problem)
     },
     markedSolution() {
-      return marked(this.localPost.solution)
+      return marked(this.post.solution)
     },
     markedLesson() {
-      return marked(this.localPost.lesson)
-    },
-    published() {
-      return this.post.postParent.status === 2
-    }
-  },
-  watch: {
-    searchTagText(to, from) {
-      if (to === from) return
-      if (this.searchTimer) clearTimeout(this.searchTimer)
-      if (this.changeTagInput(to)) return
-      this.searchTimer = setTimeout(() => {
-        this.loadTagOptions()
-        this.searchTimer = 0
-      }, 300)
+      return marked(this.post.lesson)
     }
   },
   mounted() {
     axios
-      .get(`/private/posts/${this.$route.params.id}/draft`)
+      .get(`/posts/${this.$route.params.id}`)
       .then(({ data }) => {
-        this.updateData(data)
-        this.loadTagOptions()
+        this.post = data
       })
       .catch(console.log)
-  },
-  methods: {
-    loadTagOptions() {
-      axios
-        .get(`/tags`, {
-          params: {
-            page: 1,
-            limit: 10 + this.tags.length,
-            order: 'title',
-            keyword: this.searchTagText
-          }
-        })
-        .then(({ data }) => {
-          this.tagOptions = data
-            .map(tag => tag.title)
-            .filter(tag => !this.tags.includes(tag))
-        })
-        .catch(console.log)
-    },
-    deleteTag(title) {
-      this.tags = this.tags.filter(tag => tag !== title)
-    },
-    changeTagInput(val) {
-      if (!val) return
-      const splited = val.split(/,| |　|\t/)
-      if (splited.length > 1 && splited[0].length <= 64) {
-        if (splited[0] && !this.tags.includes(splited[0])) {
-          this.tags.push(splited[0])
-        }
-        this.searchTagText = ''
-        return true
-      } else {
-        this.searchTagText = val
-      }
-    },
-    updateData(data) {
-      this.post = data
-      this.localPost = { ...data }
-      this.tags = data.tags.map(tag => tag.title)
-    },
-    save() {
-      return axios
-        .patch(`/private/posts/${this.post.id}`, {
-          title: this.localPost.title,
-          problem: this.localPost.problem,
-          solution: this.localPost.solution,
-          lesson: this.localPost.lesson,
-          tags: this.tags
-        })
-        .then(({ data }) => {
-          this.updateData(data)
-        })
-        .catch(console.log)
-    },
-    publish() {
-      this.save().then(() => {
-        axios
-          .patch(`/private/posts/${this.post.id}/publish`)
-          .then(({ data }) => {
-            console.log(data)
-            this.post.postParent.status = 2
-          })
-          .catch(console.log)
-      })
-    },
-    unpublish() {
-      this.save().then(() => {
-        axios
-          .patch(`/private/posts/${this.post.id}/unpublish`)
-          .then(() => {
-            this.post.postParent.status = 1
-          })
-          .catch(console.log)
-      })
-    }
   }
 }
 </script>
 
 <style scoped>
+h1 {
+  font-size: 2.4rem;
+  text-align: left;
+}
 h2 {
   font-size: 2rem;
   text-align: left;
+  margin-top: 1rem;
 }
 .tags {
   text-align: left;
-}
-.editor-box {
-  display: flex;
-  margin-bottom: 1rem;
+  margin-top: 0.6rem;
   border-bottom: 0.1rem solid rgba(100, 100, 100, 0.5);
-}
-.editor-box > * {
-  width: 50%;
 }
 .marked {
   text-align: left;
   padding: 1.2rem;
+  margin-bottom: 1rem;
+  border-bottom: 0.1rem solid rgba(100, 100, 100, 0.5);
 }
 .marked /deep/ code {
   box-shadow: none;
