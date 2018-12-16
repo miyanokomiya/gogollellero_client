@@ -45,7 +45,7 @@
         <v-card-title 
           primary-title 
           class="title-box">
-          <router-link :to="{ name: 'mypage-posts-id', params: { id: post.postParent.id }}">
+          <router-link :to="{ name: post.postParent.status === 2 ? 'posts-id' : 'mypage-posts-id', params: { id: post.postParent.id }}">
             <h3 class="headline mb-0 title">{{ post.title }}</h3>
             <div>{{ post.createdAt }}</div>
             <div 
@@ -69,6 +69,13 @@
             flat 
             color="orange"
             @click="deletePost(post.id)">Delete</v-btn>
+          <router-link 
+            :to="{ name: 'mypage-posts-id', params: { id: post.postParent.id }}" 
+            class="edit-link">
+            <v-btn 
+              flat 
+              color="orange">Edit</v-btn>
+          </router-link>
         </v-card-actions>
       </v-card>
     </v-flex>
@@ -179,5 +186,8 @@ export default {
 }
 .title-box {
   padding: 0.6rem;
+}
+.edit-link {
+  text-decoration: none;
 }
 </style>
