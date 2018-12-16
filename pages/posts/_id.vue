@@ -68,10 +68,24 @@
         </div>
         <v-btn
           :disabled="!valid"
-          color="success"
-          @click="submit"
+          color="info"
+          @click="save"
         >
-          submit
+          Save
+        </v-btn>
+        <v-btn
+          v-if="!published"
+          :disabled="!valid"
+          color="success"
+          @click="publish"
+        >
+          Publish
+        </v-btn>
+        <v-btn
+          v-else
+          @click="unpublish"
+        >
+          Unpublish
         </v-btn>
       </v-form>
     </v-flex>
@@ -104,6 +118,9 @@ export default {
     },
     markedLesson() {
       return marked(this.localPost.lesson)
+    },
+    published() {
+      return this.post.postParent.status === 2
     }
   },
   watch: {
@@ -169,8 +186,8 @@ export default {
       this.localPost = { ...data }
       this.tags = data.tags.map(tag => tag.title)
     },
-    submit() {
-      axios
+    save() {
+      return axios
         .patch(`/private/posts/${this.post.id}`, {
           title: this.localPost.title,
           problem: this.localPost.problem,
@@ -182,6 +199,27 @@ export default {
           this.updateData(data)
         })
         .catch(console.log)
+    },
+    publish() {
+      this.save().then(() => {
+        axios
+          .patch(`/private/posts/${this.post.id}/publish`)
+          .then(({ data }) => {
+            console.log(data)
+            this.post.postParent.status = 2
+          })
+          .catch(console.log)
+      })
+    },
+    unpublish() {
+      this.save().then(() => {
+        axios
+          .patch(`/private/posts/${this.post.id}/unpublish`)
+          .then(() => {
+            this.post.postParent.status = 1
+          })
+          .catch(console.log)
+      })
     }
   }
 }

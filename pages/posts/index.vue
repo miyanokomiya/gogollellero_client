@@ -8,6 +8,18 @@
         @click="create">
         <v-icon color="grey lighten-1">add</v-icon>
       </v-btn>
+      <div class="my-tags">
+        <v-chip 
+          v-for="tag in tags" 
+          :key="tag.id" 
+          :color="tagTitle === tag.title ? 'red' : 'green'"
+          text-color="white"
+          small
+          @click="selectTag(tag)"
+        >
+          {{ tag.title }}
+        </v-chip>
+      </div>
       <v-tabs
         v-model="typeTab"
         color="cyan"
@@ -25,18 +37,6 @@
           Published
         </v-tab>
       </v-tabs>
-      <div class="my-tags">
-        <v-chip 
-          v-for="tag in tags" 
-          :key="tag.id" 
-          :color="tagTitle === tag.title ? 'red' : 'green'"
-          text-color="white"
-          small
-          @click="selectTag(tag)"
-        >
-          {{ tag.title }}
-        </v-chip>
-      </div>
       <v-card
         v-for="post in posts"
         :key="post.name"
@@ -157,6 +157,7 @@ export default {
 <style scoped>
 .my-tags {
   margin-bottom: 1rem;
+  text-align: left;
 }
 .item {
   text-align: left;
