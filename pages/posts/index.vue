@@ -8,6 +8,23 @@
         @click="create">
         <v-icon color="grey lighten-1">add</v-icon>
       </v-btn>
+      <v-tabs
+        v-model="typeTab"
+        color="cyan"
+        dark
+        slider-color="yellow"
+      >
+        <v-tab 
+          ripple 
+        >
+          Draft
+        </v-tab>
+        <v-tab 
+          ripple 
+        >
+          Published
+        </v-tab>
+      </v-tabs>
       <div class="my-tags">
         <v-chip 
           v-for="tag in tags" 
@@ -63,16 +80,23 @@ import axios from '@/commons/axios'
 
 export default {
   asyncData({ query }) {
-    return { tagTitle: query.tag || '' }
+    return { tagTitle: query.tag || '', type: query.type || 'draft' }
   },
   data: () => ({
     posts: [],
-    tags: []
+    tags: [],
+    tagTitle: '',
+    type: 'draft'
   }),
-  watchQuery: ['tag'],
-  watch: {
-    tagTitle() {
-      this.load()
+  computed: {
+    typeTab: {
+      get() {
+        return ['draft', 'published'].indexOf(this.type)
+      },
+      set(val) {
+        this.type = val === 0 ? 'draft' : 'published'
+        this.updateQuery()
+      }
     }
   },
   mounted() {
@@ -82,7 +106,7 @@ export default {
     load() {
       axios
         .get(`/private/posts`, {
-          params: { tag: this.tagTitle || undefined }
+          params: { tag: this.tagTitle || undefined, type: this.type }
         })
         .then(({ data }) => {
           this.posts = data
@@ -115,10 +139,16 @@ export default {
     },
     selectTag(tag) {
       if (this.tagTitle === tag.title) {
-        this.$router.push(`/posts`)
+        this.tagTitle = ''
       } else {
-        this.$router.push(`/posts?tag=${tag.title}`)
+        this.tagTitle = tag.title
       }
+      this.updateQuery()
+    },
+    updateQuery() {
+      const queryTag = this.tagTitle ? `&tag=${this.tagTitle}` : ''
+      this.$router.push(`/posts?type=${this.type}${queryTag}`)
+      this.load()
     }
   }
 }

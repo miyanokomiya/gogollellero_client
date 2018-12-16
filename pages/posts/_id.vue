@@ -119,7 +119,11 @@ export default {
   },
   mounted() {
     axios
-      .get(`/private/posts/${this.$route.params.id}`)
+      .get(`/private/posts/${this.$route.params.id}`, {
+        params: {
+          type: 'draft'
+        }
+      })
       .then(({ data }) => {
         this.updateData(data)
         this.loadTagOptions()
