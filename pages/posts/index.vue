@@ -45,7 +45,7 @@
         <v-card-title 
           primary-title 
           class="title-box">
-          <router-link :to="`/posts/${post.id}`">
+          <router-link :to="`/posts/${post.postParent.id}`">
             <h3 class="headline mb-0 title">{{ post.title }}</h3>
             <div>{{ post.createdAt }}</div>
             <div 
@@ -125,7 +125,7 @@ export default {
           title: 'untitled'
         })
         .then(({ data }) => {
-          this.$router.push(`/posts/${data.id}`)
+          this.$router.push(`/posts/${data.postParent.id}`)
         })
         .catch(console.log)
     },
