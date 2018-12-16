@@ -54,7 +54,7 @@ export default {
             password: this.password
           })
           .then(res => {
-            this.$router.push('/posts')
+            this.$router.push({ name: 'mypage-posts' })
           })
       }
     }
